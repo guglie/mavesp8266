@@ -180,19 +180,56 @@ void handle_getParameters()
     String message = FPSTR(kHEADER);
     message += "<p>Parameters</p><table><tr><td width=\"240\">Name</td><td>Value</td></tr>";
     for(int i = 0; i < MavESP8266Parameters::ID_COUNT; i++) {
+		
+		//if its a char[16] parameter hashed into 4 uint32_t handle it as a string
+		
+		stMavEspParameters* param = getWorld()->getParameters()->getAt(i);
+		uint16_t param_index = param->index;
+		String param_value = "";
+		
+		
+		if( param_index == MavESP8266Parameters::ID_SSID1 || param_index == MavESP8266Parameters::ID_PASS1 || param_index == MavESP8266Parameters::ID_SSIDSTA1 || param_index == MavESP8266Parameters::ID_PASSSTA1) {
+			
+			switch(param_index) {
+				case MavESP8266Parameters::ID_SSID1:
+					param_value += getWorld()->getParameters()->getWifiSsid();
+					break;
+				case MavESP8266Parameters::ID_PASS1:
+					param_value += getWorld()->getParameters()->getWifiPassword();
+					break;
+				case MavESP8266Parameters::ID_SSIDSTA1:
+					param_value += getWorld()->getParameters()->getWifiStaSsid();
+					break;
+				case MavESP8266Parameters::ID_PASSSTA1:
+					param_value += getWorld()->getParameters()->getWifiStaPassword();
+					break;
+			}
+			
+			//skip the other three uint32_t parameters which contain the string
+			i+=3;
+			
+		} else {
+			
+			unsigned long val = 0;
+	        if(getWorld()->getParameters()->getAt(i)->type == MAV_PARAM_TYPE_UINT32)
+	            val = (unsigned long)*((uint32_t*)getWorld()->getParameters()->getAt(i)->value);
+	        else if(getWorld()->getParameters()->getAt(i)->type == MAV_PARAM_TYPE_UINT16)
+	            val = (unsigned long)*((uint16_t*)getWorld()->getParameters()->getAt(i)->value);
+	        else
+	            val = (unsigned long)*((int8_t*)getWorld()->getParameters()->getAt(i)->value);
+			
+			param_value += val;
+		}
+		
         message += "<tr><td>";
-        message += getWorld()->getParameters()->getAt(i)->id;
+        message += param->id;
         message += "</td>";
-        unsigned long val = 0;
-        if(getWorld()->getParameters()->getAt(i)->type == MAV_PARAM_TYPE_UINT32)
-            val = (unsigned long)*((uint32_t*)getWorld()->getParameters()->getAt(i)->value);
-        else if(getWorld()->getParameters()->getAt(i)->type == MAV_PARAM_TYPE_UINT16)
-            val = (unsigned long)*((uint16_t*)getWorld()->getParameters()->getAt(i)->value);
-        else
-            val = (unsigned long)*((int8_t*)getWorld()->getParameters()->getAt(i)->value);
+        
         message += "<td>";
-        message += val;
+        message += param_value;
         message += "</td></tr>";
+		
+		
     }
     message += "</table>";
     message += "</body>";
