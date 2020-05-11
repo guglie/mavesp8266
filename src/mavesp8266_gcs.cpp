@@ -244,7 +244,7 @@ MavESP8266GCS::sendMessageRaw(uint8_t *buffer, int len) {
 void
 MavESP8266GCS::_sendRadioStatus()
 {
-    linkStatus* st = _forwardTo->getStatus();
+    linkStatus* uart_link_status = _forwardTo->getStatus();
     uint8_t rssi = 0;
     uint8_t lostVehicleMessages = 100;
     uint8_t lostGcsMessages = 100;
@@ -253,8 +253,8 @@ MavESP8266GCS::_sendRadioStatus()
         rssi = (uint8_t)wifi_station_get_rssi();
     }
 
-    if (st->packets_received > 0) {
-        lostVehicleMessages = (st->packets_lost * 100) / st->packets_received;
+    if (uart_link_status->packets_received > 0) {
+        lostVehicleMessages = (uart_link_status->packets_lost * 100) / uart_link_status->packets_received;
     }
 
     if (_status.packets_received > 0) {
@@ -270,7 +270,7 @@ MavESP8266GCS::_sendRadioStatus()
         &msg,
         rssi,                   // RSSI Only valid in STA mode
         0,                      // We don't have access to Remote RSSI
-        st->queue_status,       // UDP queue status
+        _status.queue_status,       // UDP queue status
         0,                      // We don't have access to noise data
         lostVehicleMessages,    // Percent of lost messages from Vehicle (UART)
         lostGcsMessages,        // Percent of lost messages from GCS (UDP)

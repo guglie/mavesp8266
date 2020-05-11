@@ -237,6 +237,7 @@ MavESP8266Vehicle::_readMessage()
 void
 MavESP8266Vehicle::_sendRadioStatus()
 {
+    linkStatus* gcs_link_status = _forwardTo->getStatus();
     getStatus();
     //-- Build message
     mavlink_message_t msg {};
@@ -247,10 +248,10 @@ MavESP8266Vehicle::_sendRadioStatus()
         &msg,
         0,      // We don't have access to RSSI
         0,      // We don't have access to Remote RSSI
-        _status.queue_status, // UDP queue status
+        gcs_link_status->queue_status, // UDP queue status
         0,      // We don't have access to noise data
         0,      // We don't have access to remote noise data
-        (uint16_t)(_status.packets_lost / 10),
+        (uint16_t) gcs_link_status->packets_lost,
         0       // We don't fix anything
     );
     sendMessage(&msg);
