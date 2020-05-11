@@ -245,13 +245,13 @@ MavESP8266Vehicle::_sendRadioStatus()
         MAV_COMP_ID_UDP_BRIDGE,
         _send_chan,
         &msg,
-        0,      // We don't have access to RSSI
-        0,      // We don't have access to Remote RSSI
-        _status.queue_status, // UDP queue status
-        0,      // We don't have access to noise data
-        0,      // We don't have access to remote noise data
-        (uint16_t)(_status.packets_lost / 10),
-        0       // We don't fix anything
+        MAVLINK_RADIO_STATUS_INVALID_RSSI,      // We don't have access to RSSI
+        MAVLINK_RADIO_STATUS_INVALID_REMRSSI,   // We don't have access to Remote RSSI
+        _status.queue_status,                   // UDP queue status
+        MAVLINK_RADIO_STATUS_INVALID_NOISE,     // We don't have access to noise data
+        MAVLINK_RADIO_STATUS_INVALID_REMNOISE,  // We don't have access to remote noise data
+        (uint16_t) _status.packets_lost,        // Count of radio packet receive errors (since boot)
+        0                                       // We don't fix anything
     );
     sendMessage(&msg);
     _status.radio_status_sent++;

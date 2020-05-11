@@ -77,6 +77,11 @@ class MavESP8266GCS;
 #define DEBUG_LOG(format, ...) do { } while(0)
 #endif
 
+#define MAVLINK_RADIO_STATUS_INVALID_RSSI 255
+#define MAVLINK_RADIO_STATUS_INVALID_REMRSSI 255
+#define MAVLINK_RADIO_STATUS_INVALID_NOISE 255
+#define MAVLINK_RADIO_STATUS_INVALID_REMNOISE 255
+
 //---------------------------------------------------------------------------------
 //-- Link Status
 struct linkStatus {
